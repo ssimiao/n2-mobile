@@ -2,10 +2,10 @@ import { StatusBar } from 'expo-status-bar';
 
 import {
   Alert, TextInput, TouchableOpacity,
-  View, Keyboard, ScrollView, Image, StyleSheet
+  View, Keyboard, Image, StyleSheet
 } from 'react-native';
 import { useState, useEffect } from 'react';
-import { GluestackUIProvider, Button, ButtonText, Text, Box, Input, Center, InputField, VStack, HStack, Progress } from "@gluestack-ui/themed";
+import { GluestackUIProvider, Button, ButtonText, ScrollView, Text, Box, Input, Center, InputField, VStack, HStack, Progress } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
 import * as DbService from './DbProdutos';
 import * as DbVendaService from './DbVendas';
@@ -38,40 +38,6 @@ export default function ListaVendas() {
     }, []);
 
 
-  function createUniqueId() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(0, 2);
-  }
-
-
-  async function salvaDados() {
-    let novoRegistro = (codigo == undefined);
-
-    let obj = {
-      codigo: novoRegistro ? createUniqueId() : codigo,
-      descricao: descricao,
-      valor: valor,
-    };
-
-    try {
-
-      let resposta = false;
-      if (novoRegistro)
-        resposta = await DbService.adicionaProduto(obj);
-      else
-        resposta = await DbService.alteraProduto(obj);
-
-      if (resposta)
-        Alert.alert('Sucesso!');
-      else
-        Alert.alert('Falha!');
-
-      Keyboard.dismiss();
-      limparCampos();
-      await carregaDados();
-    } catch (e) {
-      Alert.alert(e);
-    }
-  }
 
   async function carregaDados() {
     try {
@@ -89,111 +55,6 @@ export default function ListaVendas() {
   }
 
 
-  function adicionarProdutoAoCarrinho(identificador) {
-    const produto = produtos.find(produto => produto.codigo == identificador);
-
-    if (produto != undefined) {
-      setCodigo(produto.codigo);
-      setDescricao(produto.descricao);
-      setValor(produto.valor);
-    }
-
-    console.log(produto);
-    let produtoCarrinho = carrinho.find(produto => {
-        console.log(produto)
-        return produto.codigo == identificador
-    });
-    
-    console.log("Ja tem produto no carrinho: " + produtoCarrinho == undefined)
-    if (produtoCarrinho == undefined)
-        setCarrinho([...carrinho, {'codigo': produto.codigo, 'descricao': produto.descricao, 'valor': produto.valor, 'quantidade': 1}])
-    else {
-        let novoArray = carrinho.map((value, index) => {
-            console.log("produto carrinho" + JSON.stringify(produtoCarrinho))
-            console.log("produto lista" + JSON.stringify(value))
-            console.log(value.codigo == produtoCarrinho.codigo)
-            if(value.codigo == produtoCarrinho.codigo){
-                value.quantidade = value.quantidade + 1
-            }
-
-            return value
-        })
-        setCarrinho(novoArray)
-    }
-  }
-
-
-  async function limparCampos() {
-    setDescricao("");
-    setValor("");
-    setCodigo(undefined);
-    Keyboard.dismiss();
-  }
-
-
-  async function efetivaExclusao() {
-    try {
-      await DbService.excluiTodosContatos();
-      await carregaDados();
-    }
-    catch (e) {
-      Alert.alert(e);
-    }
-  }
-
-  function apagarTudo() {
-    if (Alert.alert('Muita atenção!!!', 'Confirma a exclusão de todos os contatos?',
-      [
-        {
-          text: 'Sim, confirmo!',
-          onPress: () => {
-            efetivaExclusao();
-          }
-        },
-        {
-          text: 'Não!!!',
-          style: 'cancel'
-        }
-      ]));
-  }
-
-
-  function diminuirQuantidade(identificador) {
-    const produto = produtos.find(produto => produto.codigo == identificador);
-    console.log(produto);
-
-    let produtoCarrinho = carrinho.find(produto => {
-        return produto.codigo == identificador
-    });
-    
-    console.log("Não tem produto no carrinho: " + produtoCarrinho == undefined)
-    if (produtoCarrinho != undefined){
-        let novoArray = carrinho.map((value, index) => {
-            if(value.codigo == produtoCarrinho.codigo){
-                value.quantidade = value.quantidade - 1
-            }
-
-            return value
-        })
-
-        setCarrinho(novoArray.filter(a => a.quantidade >= 0))
-    }
-  }
-
-  async function efetivaRemoverContato(identificador) {
-    try {
-      console.log(identificador)
-      await DbService.excluiProduto(identificador);
-      Keyboard.dismiss();
-      limparCampos();
-      await carregaDados();
-      Alert.alert('Produto apagado com sucesso!!!');
-    } catch (e) {
-      Alert.alert(e);
-    }
-  }
-
-
   return (
     <GluestackUIProvider config={config}>
       <Center mt={40}>
@@ -207,7 +68,7 @@ export default function ListaVendas() {
 
       <Box mx={10} mt={10}>
 
-        <ScrollView>
+        <ScrollView mt={5} h='80%'>
         {
             vendas.map((venda, index) => {
                 console.log(venda[0].codigo)
@@ -220,7 +81,7 @@ export default function ListaVendas() {
                             {
                                 venda.map((produto, index) => {
                                     console.log(produto)
-                                    totalSum = totalSum + produto.valorProduto
+                                    totalSum = totalSum + produto.valorProduto * produto.quantidade
                                     return (<Box>
                                         <HStack space='xs'>
                                             <HStack minWidth={280}>
@@ -235,13 +96,13 @@ export default function ListaVendas() {
                                                 }
                                             
                                                 <Center >
-                                                    <Box minWidth={150}>
+                                                    <Box minWidth={140}>
                                                         <Text><Text bold>Nome:</Text> {produto.nomeProduto}</Text>
                                                     </Box>
                                                 </Center>
 
                                                 <Center >
-                                                    <Box minWidth={140}>
+                                                    <Box minWidth={125}>
                                                         <Text><Text bold>Quantidade:</Text> {produto.quantidade}</Text>
                                                     </Box>
                                                 </Center>

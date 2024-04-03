@@ -2,10 +2,10 @@ import { StatusBar } from 'expo-status-bar';
 
 import {
   Alert, TextInput, TouchableOpacity,
-  View, Keyboard, ScrollView, Image, StyleSheet
+  View, Keyboard, Image, StyleSheet
 } from 'react-native';
 import { useState, useEffect } from 'react';
-import { GluestackUIProvider, Button, ButtonText, Text, Box, Input, Center, InputField, VStack, HStack, Select, SelectTrigger, SelectInput, SelectIcon, Icon, ChevronDownIcon, SelectPortal, SelectBackdrop, SelectContent, SelectDragIndicatorWrapper, SelectDragIndicator } from "@gluestack-ui/themed";
+import { GluestackUIProvider, Button, ButtonText, Text, Box, Input, ScrollView, Center, InputField, VStack, HStack, Select, SelectTrigger, SelectInput, SelectIcon, Icon, ChevronDownIcon, SelectPortal, SelectBackdrop, SelectContent, SelectDragIndicatorWrapper, SelectDragIndicator } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
 import * as DbService from './DbProdutos';
 import * as DbCategoriaService from './DbCategoria';
@@ -108,8 +108,6 @@ export default function Produtos() {
     setDescricao("");
     setValor("");
     setCodigo(undefined);
-    setIdCategoria("")
-    setNomeCategoria("")
     Keyboard.dismiss();
   }
 
@@ -173,10 +171,6 @@ export default function Produtos() {
     setIdCategoria(categoria.codigo)
   }
 
-  function findDescCategoria(desc) {
-    let categoria = categorias.find((value, index) => value.codigo === desc.codigo)
-    return categoria.descricao;
-  }
 
   return (
     <GluestackUIProvider config={config}>
@@ -229,9 +223,12 @@ export default function Produtos() {
             <InputField value={valor != undefined ? String(valor) : valor} onChangeText={(texto) => setValor(texto)} />
           </Input>
         </Box>
-
         
-        <Select selectedValue={nomeCategoria} onValueChange={select => findIdCategoria(select)}>
+        {
+          console.log(codigo)
+        }
+
+        <Select selectedValue={codigo == undefined || codigo == null ? null : nomeCategoria} onValueChange={select => findIdCategoria(select)}>
             <Text>Categorias</Text>
           <SelectTrigger  variant="outline" size="md" >
             <SelectInput placeholder="Selecione a categoria" />
@@ -244,12 +241,12 @@ export default function Produtos() {
                 <SelectDragIndicator />
               </SelectDragIndicatorWrapper>
                 {
-                    categorias.map((value, index) => 
-                        {
-                            console.log(value)
-                            return (<SelectItem label={value.descricao} value={value} />) 
-                        }
-                    )
+                  categorias.map((value, index) => 
+                      {
+                          console.log(value)
+                          return (<SelectItem label={value.descricao} value={value} />) 
+                      }
+                  )
                 }
             </SelectContent>
           </SelectPortal>
@@ -268,46 +265,43 @@ export default function Produtos() {
           <ButtonText>Adiciona/Atualiza</ButtonText>
         </Button>
 
-        <ScrollView>
-        {
-          produtos.map((produto, index) => (
-            <Box mt={5}>
-              <HStack space='xs'>
-                <HStack minWidth={280}>
-                    <Center >
-                        <Box minWidth={150}>
-                            <Text>Nome: {produto.descricao} </Text>
-                        </Box>
-                    </Center>
-                    <Center>
-                        <Text>|  Preço {produto.valor}</Text>
-                    </Center>
+        <ScrollView mt={5} h='$80'>
+          {
+            produtos.map((produto, index) => (
+                <HStack mt={8} space='xs'>
+                  <HStack minWidth={270}>
+                      <Center >
+                          <Box minWidth={150}>
+                              <Text>Nome: {produto.descricao} </Text>
+                          </Box>
+                      </Center>
+                      <Center>
+                          <Text>|  Preço {produto.valor}</Text>
+                      </Center>
+                  </HStack>
+                  <Button
+                    size="sm"
+                    variant="solid"
+                    action="primary"
+                    isDisabled={false}
+                    isFocusVisible={false}
+                    onPress={() => removerElemento(produto.codigo)}
+                  >
+                    <ButtonText size='xs'>-</ButtonText>
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="solid"
+                    action="primary"
+                    isDisabled={false}
+                    isFocusVisible={false}
+                    onPress={() => editar(produto.codigo)}
+                  >
+                    <ButtonText size='xs'>+</ButtonText>
+                  </Button>
                 </HStack>
-                <Button
-                  size="sm"
-                  variant="solid"
-                  action="primary"
-                  isDisabled={false}
-                  isFocusVisible={false}
-                  onPress={() => removerElemento(produto.codigo)}
-                >
-                  <ButtonText size='xs'>-</ButtonText>
-                </Button>
-                <Button
-                  size="sm"
-                  variant="solid"
-                  action="primary"
-                  isDisabled={false}
-                  isFocusVisible={false}
-                  onPress={() => editar(produto.codigo)}
-                >
-                  <ButtonText size='xs'>+</ButtonText>
-                </Button>
-              </HStack>
-            </Box>
-          ))
-        }
-
+            ))
+          }
       </ScrollView>
       </Box>
     </GluestackUIProvider>
