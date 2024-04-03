@@ -2,10 +2,10 @@ import { StatusBar } from 'expo-status-bar';
 
 import {
   Alert, TextInput, TouchableOpacity,
-  View, Keyboard, ScrollView, Image, StyleSheet
+  View, Keyboard, Image, StyleSheet
 } from 'react-native';
 import { useState, useEffect } from 'react';
-import { GluestackUIProvider, Button, ButtonText, Text, Box, Input, Center, InputField, VStack, HStack } from "@gluestack-ui/themed";
+import { GluestackUIProvider, Button, ScrollView, ButtonText, Text, Box, Input, Center, InputField, VStack, HStack } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
 import * as DbService from './DbProdutos';
 import * as DbVendaService from './DbVendas';
@@ -99,7 +99,7 @@ export default function Vendas() {
             return value
         })
 
-        setCarrinho(novoArray.filter(a => a.quantidade >= 0))
+        setCarrinho(novoArray.filter(a => a.quantidade > 0))
     }
   }
 
@@ -129,12 +129,12 @@ export default function Vendas() {
       <Box mx={20}>
 
         <Text mt={20} bold>Produtos Disponiveis: </Text>
-        <ScrollView>
+        <ScrollView mt={5} h='$80'>
         {
           produtos.map((produto, index) => (
             <Box mt={5}>
               <HStack space='xs'>
-                <HStack minWidth={280}>
+                <HStack minWidth={270}>
                     <Center >
                         <Box minWidth={150}>
                             <Text>Nome: {produto.descricao} </Text>
@@ -171,7 +171,7 @@ export default function Vendas() {
       </ScrollView>
 
       <Text mt={20} bold>Carrinho de compras: </Text>
-        <ScrollView>
+        <ScrollView mt={5} h='25%'>
         {
           carrinho.map((produto, index) => (
             <Box mt={5}>

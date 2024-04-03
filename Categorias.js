@@ -2,10 +2,10 @@ import { StatusBar } from 'expo-status-bar';
 
 import {
   Alert, TextInput, TouchableOpacity,
-  View, Keyboard, ScrollView, Image, StyleSheet
+  View, Keyboard, Image, StyleSheet
 } from 'react-native';
 import { useState, useEffect } from 'react';
-import { GluestackUIProvider, Button, ButtonText, Text, Box, Input, Center, InputField, VStack, HStack } from "@gluestack-ui/themed";
+import { GluestackUIProvider, Button, ScrollView, ButtonText, Text, Box, Input, Center, InputField, VStack, HStack } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
 import * as DbCategoriaService from './DbCategoria';
 
@@ -203,13 +203,13 @@ export default function Categorias() {
           <ButtonText>Adiciona/Atualiza</ButtonText>
         </Button>
 
-        <ScrollView>
+        <ScrollView mt={5} h='$80'>
         {
           categorias.map((categoria, index) => (
             <Box mt={5}>
               <HStack space='xs'>
                 <Center>
-                    <Box minWidth={280}>
+                    <Box minWidth={270}>
                         <Text>Descrição: {categoria.descricao}</Text>
                     </Box>
                 </Center>
